@@ -1,0 +1,17 @@
+{
+  "name": "journey-junkies",
+  "version": "1.0.0",
+  "description": "## Contribution  - Clone the repo - Create a branch - Commit your commits - push your commits - create a pull request - add pull request details - ask your team mates for review",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "client": "cd client && npm run dev",
+    "server": "cd server && nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
