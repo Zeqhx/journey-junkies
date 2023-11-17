@@ -1,10 +1,19 @@
 import express from "express";
 import pool from "../DB/index.js";
+
 const posts = express.Router();
+
+// Helper function to build the WHERE clause of the query
+const buildWhereClause = (conditions, queryParams) => {
+  if (conditions.length) {
+    return " WHERE " + conditions.join(" AND ");
+  }
+  return "";
+};
 
 // ========= Get All posts (this is the search functionality) ========= //
 posts.get("/", async (req, res) => {
-  const { rating } = req.query;
+  const { rating, date, username } = req.query;
   const minRating = parseInt(rating, 10) || null;
 
   let query = "SELECT * FROM post";
@@ -26,10 +35,7 @@ posts.get("/", async (req, res) => {
     queryParams.push(username);
   }
 
-  if (conditions.length) {
-    query += " WHERE " + conditions.join(" AND ");
-  }
-
+  query += buildWhereClause(conditions, queryParams);
   query += " ORDER BY date DESC";
 
   try {
@@ -40,6 +46,7 @@ posts.get("/", async (req, res) => {
     res.status(500).send("An error occurred while fetching the posts.");
   }
 });
+
 // ========= CREATE posts ========= //
 posts.post("/", async (req, res) => {
   const { author, title, content, image, description } = req.body;
@@ -49,11 +56,11 @@ posts.post("/", async (req, res) => {
   }
 
   try {
-    const uuid = await pool.query(
+    const result = await pool.query(
       'INSERT INTO "post" (author, title, content, image, description) VALUES ($1, $2, $3, $4, $5) RETURNING id',
       [author, title, content, image, description]
     );
-    res.json(uuid.rows[0].id);
+    res.json(result.rows[0].id);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred" });
@@ -64,7 +71,7 @@ posts.post("/", async (req, res) => {
 posts.delete("/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    const uuid = await pool.query('DELETE FROM "posts" WHERE id = $1', [id]);
+    const result = await pool.query('DELETE FROM "posts" WHERE id = $1', [id]);
     res.json({ success: true });
   } catch (error) {
     console.error(error);
@@ -80,9 +87,9 @@ posts.put("/:id", async (req, res) => {
   if (!author || !title || !content || !banner) {
     return res.status(400).json({ error: "Missing required parameters" });
   }
-  // I think here we need to find the record by the id and then update it
+
   try {
-    const uuid = await pool.query(
+    const result = await pool.query(
       'UPDATE "posts" SET author = $1, title = $2, content = $3, banner = $4 WHERE id = $5',
       [author, title, content, banner, id]
     );
@@ -97,11 +104,11 @@ posts.put("/:id", async (req, res) => {
 posts.get("/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    const uuid = await pool.query('SELECT * FROM "post" WHERE id = $1', [id]);
-    if (uuid.rows.length === 0) {
+    const result = await pool.query('SELECT * FROM "post" WHERE id = $1', [id]);
+    if (result.rows.length === 0) {
       return res.status(404).json({ error: "post not found" });
     }
-    res.json(uuid.rows[0]);
+    res.json(result.rows[0]);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred" });
