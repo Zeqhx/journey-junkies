@@ -102,13 +102,7 @@ const Write = () => {
           creativity
         </Text>
       </Title>
-      <form method="post" action="/write" onSubmit={(e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target as HTMLFormElement);
-  for (let [key, value] of formData.entries()) {
-    console.log(key, value);
-  }
-}}>
+      <Form method="post" action="/write">
         <TextInput
           placeholder="your amazing blog title"
           label="Title"
@@ -239,7 +233,7 @@ const Write = () => {
         <Button type="submit" fullWidth mt="lg">
           Save
         </Button>
-      </form>
+      </Form>
     </Container>
   );
 };
