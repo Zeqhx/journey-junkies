@@ -6,18 +6,27 @@ import { createClerkClient, clerkClient } from "@clerk/clerk-sdk-node";
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true })); // New
 app.use("/", apiRouter);
 const port = 8081;
 
-app.get("/", async (_, res) => {
-  try {
-    const data = await pool.query('SELECT * FROM "User"');
-    res.json({ message: `Hello from ${data.rows[0].firtsName} the backend!` });
-  } catch (error) {
-    console.error(error);
-  }
-});
+// app.get("", (req, res) => {
+//   pool.getConnection((err, connection) => {
+//     if (err) throw err;
+//     console.log("connected as id " + connection.threadId);
+//     connection.query("SELECT * from users", (err, rows) => {
+//       connection.release(); // return the connection to pool
+
+//       if (!err) {
+//         res.send(rows);
+//       } else {
+//         console.log(err);
+//       }
+
+//       console.log("The data from beer table are: \n", rows);
+//     });
+//   });
+// });
 
 app.listen(port, async () => {
   console.log(`Server is running on port: ${port}`);

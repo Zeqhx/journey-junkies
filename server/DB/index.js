@@ -1,16 +1,10 @@
-import pkg from "pg";
-import dotenv from "dotenv";
+import mysql from "mysql";
 
-const { Pool } = pkg;
-
-dotenv.config();
-
-const pool = new Pool({
-  user: process.env.DBUSER,
-  password: process.env.PASSWORD,
-  host: process.env.HOST,
-  port: process.env.PORT,
-  database: process.env.DATABASE,
+const pool = mysql.createPool({
+  connectionLimit: 10,
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "journy_junkies",
 });
-
 export default pool;
